@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ComparaVilles — Comparateur de Villes Françaises</title>
+    <meta name="description" content="Dashboard D3.js — Comparez les villes françaises de plus de 20 000 habitants.">
+
+    <!-- Typographies : Inter (UI) + JetBrains Mono (chiffres) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="app">
+
+        <!-- ===== SIDEBAR ===== -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-icon"><span>C</span><span>V</span></div>
+                <span class="brand-text">ComparaVilles</span>
+            </div>
+
+            <nav id="main-nav">
+                <button class="tab-btn active" data-tab="carte">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="10" r="3"/><path d="M12 21.7C17.3 17 20 13 20 10a8 8 0 1 0-16 0c0 3 2.7 7 8 11.7Z"/></svg>
+                    <span>Carte</span>
+                </button>
+                <button class="tab-btn" data-tab="general">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="12" width="4" height="9" rx="1"/><rect x="10" y="7" width="4" height="14" rx="1"/><rect x="17" y="3" width="4" height="18" rx="1"/></svg>
+                    <span>Vue d'ensemble</span>
+                </button>
+                <button class="tab-btn" data-tab="emploi">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+                    <span>Emploi</span>
+                </button>
+                <button class="tab-btn" data-tab="logement">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    <span>Logement</span>
+                </button>
+                <button class="tab-btn" data-tab="meteo">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                    <span>Météo</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <p>Données : INSEE · Open-Meteo</p>
+                <p>D3.js v4 — BUT SD S4</p>
+            </div>
+        </aside>
+
+        <!-- Overlay mobile pour fermer la sidebar -->
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+        <!-- ===== ZONE PRINCIPALE ===== -->
+        <div class="main">
+
+            <!-- Topbar avec recherche style Command Palette -->
+            <header class="topbar" id="header">
+                <button class="menu-toggle" id="menu-toggle" aria-label="Ouvrir le menu">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><path d="M2 4.75A.75.75 0 0 1 2.75 4h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 4.75Zm0 5A.75.75 0 0 1 2.75 9h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 9.75Zm0 5a.75.75 0 0 1 .75-.75h14.5a.75.75 0 0 1 0 1.5H2.75a.75.75 0 0 1-.75-.75Z"/></svg>
+                </button>
+                <div id="search-container">
+                    <div class="search-inner">
+                        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                        <input type="text" id="search-city" placeholder="Rechercher une ville…" autocomplete="off">
+                        <kbd class="search-kbd">⌘K</kbd>
+                    </div>
+                    <div id="search-results"></div>
+                </div>
+            </header>
+
+            <!-- ===== CONTENU SCROLLABLE ===== -->
+            <div class="content">
+
+                <!-- ========== ONGLET CARTE ========== -->
+                <div id="tab-carte" class="tab-content active">
+                    <div class="page-title">
+                        <h2>Cartographie</h2>
+                        <p>Visualisez et sélectionnez les villes françaises de plus de 20 000 habitants</p>
+                    </div>
+                    <div class="grid-map">
+                        <div class="card card-map">
+                            <div id="map"></div>
+                        </div>
+                        <div class="card-selection-stack">
+                            <div id="city1" class="card city-card">
+                                <div class="city-card-header">
+                                    <span class="city-dot dot-v1"></span>
+                                    <span class="city-card-title">Ville 1</span>
+                                </div>
+                                <div class="placeholder" id="placeholder1">Cliquez sur une ville…</div>
+                            </div>
+                            <div id="city2" class="card city-card">
+                                <div class="city-card-header">
+                                    <span class="city-dot dot-v2"></span>
+                                    <span class="city-card-title">Ville 2</span>
+                                </div>
+                                <div class="placeholder" id="placeholder2">Cliquez sur une 2e ville…</div>
+                            </div>
+                            <div id="comparison-result" class="card city-card comparison-card">
+                                <div class="city-card-header">
+                                    <span class="city-card-title">Analyse rapide</span>
+                                </div>
+                                <div id="comparison-text"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========== ONGLET DONNÉES GÉNÉRALES ========== -->
+                <div id="tab-general" class="tab-content">
+                    <div class="page-title">
+                        <h2>Vue d'ensemble</h2>
+                        <p>Comparaison des populations et classement régional</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><h3>Comparaison visuelle</h3></div>
+                        <div id="comparison-chart"></div>
+                        <p id="comparison-placeholder" class="placeholder-text">
+                            Sélectionnez deux villes sur la carte pour lancer la comparaison.
+                        </p>
+                    </div>
+                    <div class="card">
+                        <div class="card-header" id="chart-header">
+                            <h3>Top 15 — Population municipale</h3>
+                            <div class="control-group">
+                                <label for="select-region">Région</label>
+                                <select id="select-region">
+                                    <option value="">— Choisir —</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="bar-chart"></div>
+                    </div>
+                </div>
+
+                <!-- ========== ONGLET EMPLOI ========== -->
+                <div id="tab-emploi" class="tab-content">
+                    <div class="page-title">
+                        <h2>Emploi</h2>
+                        <p>Indicateurs économiques et répartition sectorielle</p>
+                    </div>
+                    <div class="card">
+                        <div id="emploi-kpi" class="kpi-grid"></div>
+                        <p id="emploi-placeholder" class="placeholder-text">
+                            Sélectionnez deux villes sur la carte pour voir les données emploi.
+                        </p>
+                    </div>
+                    <section id="emploi-bar-section" class="card" style="display:none;">
+                        <div class="card-header"><h3>Comparaison des indicateurs</h3></div>
+                        <div id="emploi-bar-chart"></div>
+                    </section>
+                    <section id="emploi-secteurs-section" class="card" style="display:none;">
+                        <div class="card-header"><h3>Répartition sectorielle</h3></div>
+                        <div id="emploi-secteurs" class="chart-duo"></div>
+                    </section>
+                </div>
+
+                <!-- ========== ONGLET LOGEMENT ========== -->
+                <div id="tab-logement" class="tab-content">
+                    <div class="page-title">
+                        <h2>Logement</h2>
+                        <p>Parc immobilier, prix au m² et occupation</p>
+                    </div>
+                    <div class="card">
+                        <div id="logement-kpi" class="kpi-grid"></div>
+                        <p id="logement-placeholder" class="placeholder-text">
+                            Sélectionnez deux villes sur la carte pour voir les données logement.
+                        </p>
+                    </div>
+                    <section id="logement-type-section" class="card" style="display:none;">
+                        <div class="card-header"><h3>Types de logement</h3></div>
+                        <div id="logement-type" class="chart-duo"></div>
+                    </section>
+                    <section id="logement-statut-section" class="card" style="display:none;">
+                        <div class="card-header"><h3>Statut d'occupation</h3></div>
+                        <div id="logement-statut" class="chart-duo"></div>
+                    </section>
+                </div>
+
+                <!-- ========== ONGLET MÉTÉO ========== -->
+                <div id="tab-meteo" class="tab-content">
+                    <div class="page-title">
+                        <h2>Météo</h2>
+                        <p>Conditions actuelles, prévisions 7 jours et climat annuel</p>
+                    </div>
+                    <div class="card">
+                        <div id="meteo-current" class="kpi-grid"></div>
+                        <p id="meteo-placeholder" class="placeholder-text">
+                            Sélectionnez deux villes sur la carte pour voir la météo.
+                        </p>
+                    </div>
+                    <section id="meteo-forecast-section" class="card" style="display:none;">
+                        <div class="card-header"><h3>Prévisions 7 jours</h3></div>
+                        <div id="meteo-forecast"></div>
+                    </section>
+                    <section id="meteo-climat-section" class="card" style="display:none;">
+                        <div class="card-header"><h3>Climat annuel — Températures mensuelles</h3></div>
+                        <div id="meteo-climat"></div>
+                    </section>
+                </div>
+
+            </div><!-- /.content -->
+
+            <footer id="footer">
+                <p>Données : INSEE · Open-Meteo · API Géo&ensp;·&ensp;Réalisé avec D3.js v4&ensp;·&ensp;BUT Science des Données S4</p>
+            </footer>
+
+        </div><!-- /.main -->
+
+    </div><!-- /.app -->
+
+    <!-- Tooltip global (positionné par D3) -->
+    <div id="tooltip" class="tooltip"></div>
+
+    <!-- D3.js v4.1.1 via CDN Cloudflare -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.1.1/d3.js"></script>
+    <script src="script.js"></script>
+
+</body>
+
+</html>
