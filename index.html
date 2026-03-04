@@ -461,6 +461,29 @@
     <!-- Tooltip global (positionné par D3) -->
     <div id="tooltip" class="tooltip"></div>
 
+    <!-- Auth Guard Local (Remplace Supabase) -->
+    <script>
+        (function () {
+            var rawSession = localStorage.getItem('gv_session');
+            if (!rawSession) {
+                // Pas connecté -> rediriger
+                window.location.replace('login.html');
+            } else {
+                // Connecté -> afficher l'appli
+                document.querySelector('.app').style.opacity = '1';
+
+                // Mettre à jour l'email dans la sidebar (si déjà rendu)
+                var userEl = document.getElementById('sidebar-user');
+                if (userEl) {
+                    try {
+                        var session = JSON.parse(rawSession);
+                        userEl.textContent = session.email;
+                    } catch (e) { }
+                }
+            }
+        })();
+    </script>
+
     <!-- D3.js v4.1.1 via CDN Cloudflare -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.1.1/d3.js"></script>
     <script src="script.js"></script>
