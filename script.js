@@ -96,7 +96,7 @@ var JOURS_SEMAINE = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
 
 // Noms des mois
 var NOMS_MOIS = ["Jan", "Fév", "Mar", "Avr", "Mai", "Jun",
-                 "Jul", "Aoû", "Sep", "Oct", "Nov", "Déc"];
+    "Jul", "Aoû", "Sep", "Oct", "Nov", "Déc"];
 
 // Taux de chômage de base par code région (source : INSEE 2023 simplifié)
 var CHOMAGE_BASE_REGION = {
@@ -111,20 +111,20 @@ var CHOMAGE_BASE_REGION = {
 //    Utilisation exclusive des sélecteurs D3 par identifiant
 // =============================================================
 
-var mapDiv         = d3.select("#map");
-var barChartDiv    = d3.select("#bar-chart");
-var compChartDiv   = d3.select("#comparison-chart");
-var tooltip        = d3.select("#tooltip");
-var placeholder    = d3.select("#comparison-placeholder");
-var selectRegion   = d3.select("#select-region");
-var placeholderV1  = d3.select("#placeholder1");
-var placeholderV2  = d3.select("#placeholder2");
-var compResult     = d3.select("#comparison-result");
-var compText       = d3.select("#comparison-text");
-var cardVille1     = d3.select("#city1");
-var cardVille2     = d3.select("#city2");
-var searchInput    = d3.select("#search-city");
-var searchResults  = d3.select("#search-results");
+var mapDiv = d3.select("#map");
+var barChartDiv = d3.select("#bar-chart");
+var compChartDiv = d3.select("#comparison-chart");
+var tooltip = d3.select("#tooltip");
+var placeholder = d3.select("#comparison-placeholder");
+var selectRegion = d3.select("#select-region");
+var placeholderV1 = d3.select("#placeholder1");
+var placeholderV2 = d3.select("#placeholder2");
+var compResult = d3.select("#comparison-result");
+var compText = d3.select("#comparison-text");
+var cardVille1 = d3.select("#city1");
+var cardVille2 = d3.select("#city2");
+var searchInput = d3.select("#search-city");
+var searchResults = d3.select("#search-results");
 
 // =============================================================
 // 2.1 INTERACTIONS GRAPHIQUES (détails + griser le reste)
@@ -543,9 +543,9 @@ function genererDonneesLogement(ville) {
 
     // Prix au m² (réaliste selon la taille de la ville)
     var prixM2 = pop > 500000 ? 4500 + (h % 4000) :
-                 pop > 100000 ? 2800 + (h % 2500) :
-                 pop > 50000  ? 1800 + (h % 1800) :
-                                1200 + (h % 1500);
+        pop > 100000 ? 2800 + (h % 2500) :
+            pop > 50000 ? 1800 + (h % 1800) :
+                1200 + (h % 1500);
 
     // Surface et HLM
     var surface = 55 + (h % 45);
@@ -687,7 +687,7 @@ function dessinerDonut(conteneur, donnees, largeur, hauteur, titre) {
             d3.select(this).style("opacity", 1);  // d3.select(this)
             tooltip.classed("visible", true)
                 .html("<strong>" + d.data.nom + "</strong><br>" +
-                      d.data.pct.toFixed(1) + " %")
+                    d.data.pct.toFixed(1) + " %")
                 .style("left", (d3.event.clientX + 15) + "px")   // d3.event
                 .style("top", (d3.event.clientY - 10) + "px");
         })
@@ -918,7 +918,7 @@ d3.queue()
                 .attr("class", "search-item")
                 .html(function (d, i) {
                     return "<strong>" + d[colCommune] + "</strong> — " +
-                           d[colRegion] + " (" + fmt(d.PMUN) + " hab.)";
+                        d[colRegion] + " (" + fmt(d.PMUN) + " hab.)";
                 })
                 .on("click", function (d, i) {
                     // Sélection de la ville cliquée dans les résultats
@@ -1079,6 +1079,12 @@ d3.queue()
                 mettreAJourEmploi();
                 mettreAJourLogement();
                 chargerMeteo();
+
+                // Nouvelles sections
+                mettreAJourDemographie();
+                mettreAJourEducation();
+                mettreAJourTransports();
+                mettreAJourQualite();
             } else {
                 placeholderV2.text("Cliquez sur une 2e ville…");
                 cardVille2.classed("active", false);
@@ -1110,6 +1116,31 @@ d3.queue()
             d3.select("#meteo-current").selectAll("*").remove();
             d3.select("#meteo-forecast-section").style("display", "none");
             d3.select("#meteo-climat-section").style("display", "none");
+
+            // Démographie
+            d3.select("#demographie-placeholder").style("display", "block");
+            d3.select("#demographie-kpi").selectAll("*").remove();
+            d3.select("#demographie-pyramide-section").style("display", "none");
+            d3.select("#demographie-evolution-section").style("display", "none");
+            d3.select("#demographie-tableau-section").style("display", "none");
+
+            // Éducation
+            d3.select("#education-placeholder").style("display", "block");
+            d3.select("#education-kpi").selectAll("*").remove();
+            d3.select("#education-diplomes-section").style("display", "none");
+            d3.select("#education-bar-section").style("display", "none");
+
+            // Transports
+            d3.select("#transports-placeholder").style("display", "block");
+            d3.select("#transports-kpi").selectAll("*").remove();
+            d3.select("#transports-modes-section").style("display", "none");
+            d3.select("#transports-bar-section").style("display", "none");
+
+            // Qualité de vie
+            d3.select("#qualite-placeholder").style("display", "block");
+            d3.select("#qualite-kpi").selectAll("*").remove();
+            d3.select("#qualite-radar-section").style("display", "none");
+            d3.select("#qualite-bar-section").style("display", "none");
         }
 
 
@@ -1404,14 +1435,22 @@ d3.queue()
 
             // --- KPI Cards ---
             var kpis = [
-                { icon: "📉", label: "Taux de chômage",
-                  val1: emp1.tauxChomage + " %", val2: emp2.tauxChomage + " %" },
-                { icon: "👥", label: "Nombre d'emplois",
-                  val1: fmt(emp1.nbEmplois), val2: fmt(emp2.nbEmplois) },
-                { icon: "📊", label: "Taux d'activité",
-                  val1: emp1.tauxActivite + " %", val2: emp2.tauxActivite + " %" },
-                { icon: "💰", label: "Revenu médian (€/mois)",
-                  val1: fmt(emp1.revenuMedian) + " €", val2: fmt(emp2.revenuMedian) + " €" }
+                {
+                    icon: "📉", label: "Taux de chômage",
+                    val1: emp1.tauxChomage + " %", val2: emp2.tauxChomage + " %"
+                },
+                {
+                    icon: "👥", label: "Nombre d'emplois",
+                    val1: fmt(emp1.nbEmplois), val2: fmt(emp2.nbEmplois)
+                },
+                {
+                    icon: "📊", label: "Taux d'activité",
+                    val1: emp1.tauxActivite + " %", val2: emp2.tauxActivite + " %"
+                },
+                {
+                    icon: "💰", label: "Revenu médian (€/mois)",
+                    val1: fmt(emp1.revenuMedian) + " €", val2: fmt(emp2.revenuMedian) + " €"
+                }
             ];
             afficherKPI(d3.select("#emploi-kpi"), kpis, nom1, nom2);
 
@@ -1459,14 +1498,22 @@ d3.queue()
 
             // --- KPI Cards ---
             var kpis = [
-                { icon: "🏘️", label: "Nombre de logements",
-                  val1: fmt(log1.nbLogements), val2: fmt(log2.nbLogements) },
-                { icon: "💶", label: "Prix moyen au m²",
-                  val1: fmt(log1.prixM2) + " €", val2: fmt(log2.prixM2) + " €" },
-                { icon: "📐", label: "Surface moyenne (m²)",
-                  val1: log1.surfaceMoyenne + " m²", val2: log2.surfaceMoyenne + " m²" },
-                { icon: "🏗️", label: "Part HLM",
-                  val1: log1.pctHLM + " %", val2: log2.pctHLM + " %" }
+                {
+                    icon: "🏘️", label: "Nombre de logements",
+                    val1: fmt(log1.nbLogements), val2: fmt(log2.nbLogements)
+                },
+                {
+                    icon: "💶", label: "Prix moyen au m²",
+                    val1: fmt(log1.prixM2) + " €", val2: fmt(log2.prixM2) + " €"
+                },
+                {
+                    icon: "📐", label: "Surface moyenne (m²)",
+                    val1: log1.surfaceMoyenne + " m²", val2: log2.surfaceMoyenne + " m²"
+                },
+                {
+                    icon: "🏗️", label: "Part HLM",
+                    val1: log1.pctHLM + " %", val2: log2.pctHLM + " %"
+                }
             ];
             afficherKPI(d3.select("#logement-kpi"), kpis, nom1, nom2);
 
@@ -1652,7 +1699,7 @@ d3.queue()
             // Construction des URLs Open-Meteo (API gratuite, sans clé)
             var baseURL = "https://api.open-meteo.com/v1/forecast";
             var params = "&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,weathercode" +
-                         "&current_weather=true&timezone=Europe%2FParis&forecast_days=7";
+                "&current_weather=true&timezone=Europe%2FParis&forecast_days=7";
 
             var url1 = baseURL + "?latitude=" + v1.lat + "&longitude=" + v1.lon + params;
             var url2 = baseURL + "?latitude=" + v2.lat + "&longitude=" + v2.lon + params;
@@ -1692,12 +1739,18 @@ d3.queue()
             var info2 = descriptionMeteo(cw2.weathercode);
 
             var kpis = [
-                { icon: "🌡️", label: "Température actuelle",
-                  val1: cw1.temperature + " °C", val2: cw2.temperature + " °C" },
-                { icon: info1.icon, label: "Conditions",
-                  val1: info1.desc, val2: info2.desc },
-                { icon: "💨", label: "Vent",
-                  val1: cw1.windspeed + " km/h", val2: cw2.windspeed + " km/h" }
+                {
+                    icon: "🌡️", label: "Température actuelle",
+                    val1: cw1.temperature + " °C", val2: cw2.temperature + " °C"
+                },
+                {
+                    icon: info1.icon, label: "Conditions",
+                    val1: info1.desc, val2: info2.desc
+                },
+                {
+                    icon: "💨", label: "Vent",
+                    val1: cw1.windspeed + " km/h", val2: cw2.windspeed + " km/h"
+                }
             ];
             afficherKPI(d3.select("#meteo-current"), kpis, nom1, nom2);
 
@@ -1828,10 +1881,10 @@ d3.queue()
                 .on("mouseover", function (d, i) {
                     tooltip.classed("visible", true)
                         .html("<strong>" + nom1 + "</strong><br>" +
-                              jours[i] + "<br>" +
-                              "Max : " + d + "°C<br>" +
-                              "Min : " + daily1.temperature_2m_min[i] + "°C<br>" +
-                              "Précip. : " + daily1.precipitation_sum[i] + " mm")
+                            jours[i] + "<br>" +
+                            "Max : " + d + "°C<br>" +
+                            "Min : " + daily1.temperature_2m_min[i] + "°C<br>" +
+                            "Précip. : " + daily1.precipitation_sum[i] + " mm")
                         .style("left", (d3.event.clientX + 15) + "px")
                         .style("top", (d3.event.clientY - 10) + "px");
                 })
@@ -1851,10 +1904,10 @@ d3.queue()
                 .on("mouseover", function (d, i) {
                     tooltip.classed("visible", true)
                         .html("<strong>" + nom2 + "</strong><br>" +
-                              jours[i] + "<br>" +
-                              "Max : " + d + "°C<br>" +
-                              "Min : " + daily2.temperature_2m_min[i] + "°C<br>" +
-                              "Précip. : " + daily2.precipitation_sum[i] + " mm")
+                            jours[i] + "<br>" +
+                            "Max : " + d + "°C<br>" +
+                            "Min : " + daily2.temperature_2m_min[i] + "°C<br>" +
+                            "Précip. : " + daily2.precipitation_sum[i] + " mm")
                         .style("left", (d3.event.clientX + 15) + "px")
                         .style("top", (d3.event.clientY - 10) + "px");
                 })
@@ -2013,8 +2066,8 @@ d3.queue()
                 .on("mouseover", function (d, i) {
                     tooltip.classed("visible", true)
                         .html("<strong>" + nom1 + "</strong><br>" +
-                              NOMS_MOIS[i] + " : " + d.temp + "°C<br>" +
-                              "Précip. : " + climat1.precipitations[i].precip + " mm")
+                            NOMS_MOIS[i] + " : " + d.temp + "°C<br>" +
+                            "Précip. : " + climat1.precipitations[i].precip + " mm")
                         .style("left", (d3.event.clientX + 15) + "px")
                         .style("top", (d3.event.clientY - 10) + "px");
                 })
@@ -2034,8 +2087,8 @@ d3.queue()
                 .on("mouseover", function (d, i) {
                     tooltip.classed("visible", true)
                         .html("<strong>" + nom2 + "</strong><br>" +
-                              NOMS_MOIS[i] + " : " + d.temp + "°C<br>" +
-                              "Précip. : " + climat2.precipitations[i].precip + " mm")
+                            NOMS_MOIS[i] + " : " + d.temp + "°C<br>" +
+                            "Précip. : " + climat2.precipitations[i].precip + " mm")
                         .style("left", (d3.event.clientX + 15) + "px")
                         .style("top", (d3.event.clientY - 10) + "px");
                 })
@@ -2067,6 +2120,62 @@ d3.queue()
             mettreAJourBarChart(villesRegion);
         });
 
+
+        // =============================================================
+        // =============================================================
+        // 26. NOUVELLES SECTIONS (DEMOGRAPHIE, EDUCATION, TRANSPORTS, QUALITE)
+        // =============================================================
+
+        function mettreAJourDemographie() {
+            var v1 = selection[0], v2 = selection[1];
+            if (!v1 || !v2) return;
+            d3.select("#demographie-placeholder").style("display", "none");
+            d3.select("#demographie-pyramide-section").style("display", "block");
+            d3.select("#demographie-evolution-section").style("display", "block");
+
+            var div = d3.select("#demographie-pyramide");
+            div.selectAll("*").remove();
+            div.html("<p><i>Pyramide des âges (Simulation)</i> : " + v1[colCommune] + " a généralement une population " + (hashCode(v1[colCommune]) % 2 === 0 ? "plus jeune" : "plus âgée") + " que " + v2[colCommune] + ".</p>");
+
+            var ev = d3.select("#demographie-evolution");
+            ev.selectAll("*").remove();
+            ev.html("<p>Croissance estimée sur 10 ans : <br>" + v1[colCommune] + " : <strong>" + (hashCode(v1[colCommune]) % 10 - 5) + "%</strong><br>" + v2[colCommune] + " : <strong>" + (hashCode(v2[colCommune]) % 10 - 5) + "%</strong></p>");
+        }
+
+        function mettreAJourEducation() {
+            var v1 = selection[0], v2 = selection[1];
+            if (!v1 || !v2) return;
+            d3.select("#education-placeholder").style("display", "none");
+            d3.select("#education-diplomes-section").style("display", "block");
+
+            var div = d3.select("#education-diplomes");
+            div.selectAll("*").remove();
+            div.html("<p>Taux de scolarisation simulé : <br>" + v1[colCommune] + " : " + (70 + (hashCode(v1[colCommune]) % 20)) + "%<br>" + v2[colCommune] + " : " + (70 + (hashCode(v2[colCommune]) % 20)) + "%</p>");
+        }
+
+        function mettreAJourTransports() {
+            var v1 = selection[0], v2 = selection[1];
+            if (!v1 || !v2) return;
+            d3.select("#transports-placeholder").style("display", "none");
+            d3.select("#transports-modes-section").style("display", "block");
+
+            var div = d3.select("#transports-modes");
+            div.selectAll("*").remove();
+            var m1 = hashCode(v1[colCommune]) % 30;
+            var m2 = hashCode(v2[colCommune]) % 30;
+            div.html("<p>Utilisation des transports en commun : <br>" + v1[colCommune] + " : " + m1 + "%<br>" + v2[colCommune] + " : " + m2 + "%</p>");
+        }
+
+        function mettreAJourQualite() {
+            var v1 = selection[0], v2 = selection[1];
+            if (!v1 || !v2) return;
+            d3.select("#qualite-placeholder").style("display", "none");
+            d3.select("#qualite-radar-section").style("display", "block");
+
+            var div = d3.select("#qualite-radar");
+            div.selectAll("*").remove();
+            div.html("<p>Qualité de l'air (Index de 0 à 100) : <br>" + v1[colCommune] + " : " + (50 + hashCode(v1.PMUN) % 50) + "/100<br>" + v2[colCommune] + " : " + (50 + hashCode(v2.PMUN) % 50) + "/100</p>");
+        }
 
         // =============================================================
         // 26. INITIALISATION — AFFICHAGE PAR DÉFAUT
