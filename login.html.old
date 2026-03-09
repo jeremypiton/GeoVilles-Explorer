@@ -195,23 +195,79 @@
             font-size: 11px;
             color: var(--text-3);
         }
-
-        .login-theme {
-            margin-bottom: 20px;
-        }
     </style>
 </head>
 
 <body>
-    <!-- Tout le contenu sera généré dynamiquement par JavaScript -->
-    <div id="login-root"></div>
+    <div class="login-container">
+        <div class="login-card">
 
-    <!-- D3.js nécessaire pour login-builder.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.1.1/d3.js"></script>
-    <!-- Construction du DOM de la page login -->
-    <script src="login-builder.js"></script>
-    <!-- Auth locale (doit être APRES login-builder pour que le formulaire existe) -->
+            <div class="login-brand">
+                <h1>GeoVilles Explorer</h1>
+            </div>
+            <p class="login-subtitle">Connectez-vous pour explorer les villes françaises</p>
+
+            <div class="theme-select login-theme">
+                <label class="theme-label" for="theme-select">Theme</label>
+                <select id="theme-select" aria-label="Theme">
+                    <option value="system">Systeme</option>
+                    <option value="dark">Dark</option>
+                    <option value="light">White</option>
+                </select>
+            </div>
+
+            <div id="alert-error" class="alert alert-error"></div>
+            <div id="alert-success" class="alert alert-success"></div>
+
+            <!-- Login Form -->
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="email">Adresse email</label>
+                    <input type="email" id="email" placeholder="votre@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Mot de passe</label>
+                    <input type="password" id="password" placeholder="••••••••" required minlength="6">
+                </div>
+                <button type="submit" class="btn-primary" id="btn-submit">Se connecter</button>
+            </form>
+
+            <p class="toggle-mode" id="toggle-mode">
+                Pas encore de compte ? <a id="toggle-link">Créer un compte</a>
+            </p>
+
+            <div class="login-footer">
+                <p>BUT Science des Données · Semestre 4</p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Auth locale -->
     <script src="auth.js"></script>
+    <script>
+        (function () {
+            var select = document.getElementById('theme-select');
+            if (!select) return;
+
+            var root = document.documentElement;
+            var stored = localStorage.getItem('theme-preference') || 'system';
+            select.value = stored;
+
+            function applyTheme(mode) {
+                root.classList.remove('theme-light', 'theme-dark');
+                if (mode === 'light') root.classList.add('theme-light');
+                if (mode === 'dark') root.classList.add('theme-dark');
+            }
+
+            applyTheme(stored);
+            select.addEventListener('change', function () {
+                var mode = select.value;
+                localStorage.setItem('theme-preference', mode);
+                applyTheme(mode);
+            });
+        })();
+    </script>
 </body>
 
 </html>

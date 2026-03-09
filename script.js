@@ -19,6 +19,15 @@
 //   - d3.line() pour les courbes de température
 // ============================================================
 
+// =============================================================
+// ATTENTE DE LA CONSTRUCTION DU DOM PAR dom-builder.js
+// =============================================================
+
+(function () {
+    'use strict';
+
+    // Fonction d'initialisation principale
+    function initApp() {
 
 // =============================================================
 // 1. CONFIGURATION — Dimensions, marges, constantes
@@ -159,9 +168,9 @@ function clearPinnedTooltip() {
         .classed("chart-selected", false);
 }
 
-document.addEventListener("click", function (e) {
-    var target = e.target;
-    if (!target || !target.classList || !target.classList.contains("chart-interactive")) {
+d3.select(document).on("click", function () {
+    var target = d3.event.target;
+    if (!target || !d3.select(target).classed("chart-interactive")) {
         clearPinnedTooltip();
     }
 });
@@ -186,32 +195,34 @@ d3.selectAll(".tab-btn").on("click", function () {
     d3.select("#tab-" + tabCible).classed("active", true);
 
     // Fermer la sidebar sur mobile après clic
-    document.getElementById("sidebar").classList.remove("open");
-    document.getElementById("sidebar-overlay").classList.remove("open");
+    d3.select("#sidebar").classed("open", false);
+    d3.select("#sidebar-overlay").classed("open", false);
 });
 
 // --- SIDEBAR MOBILE TOGGLE ---
 d3.select("#menu-toggle").on("click", function () {
-    document.getElementById("sidebar").classList.toggle("open");
-    document.getElementById("sidebar-overlay").classList.toggle("open");
+    var sidebar = d3.select("#sidebar");
+    var overlay = d3.select("#sidebar-overlay");
+    sidebar.classed("open", !sidebar.classed("open"));
+    overlay.classed("open", !overlay.classed("open"));
 });
 
 d3.select("#sidebar-overlay").on("click", function () {
-    document.getElementById("sidebar").classList.remove("open");
-    document.getElementById("sidebar-overlay").classList.remove("open");
+    d3.select("#sidebar").classed("open", false);
+    d3.select("#sidebar-overlay").classed("open", false);
 });
 
 // --- THEME SELECT (system / dark / light) ---
 (function () {
-    var themeSelect = document.getElementById("theme-select");
-    if (!themeSelect) return;
+    var themeSelect = d3.select("#theme-select");
+    if (themeSelect.empty()) return;
 
-    var root = document.documentElement;
+    var root = d3.select(document.documentElement);
 
     function applyTheme(mode) {
-        root.classList.remove("theme-light", "theme-dark");
-        if (mode === "light") root.classList.add("theme-light");
-        if (mode === "dark") root.classList.add("theme-dark");
+        root.classed("theme-light", false).classed("theme-dark", false);
+        if (mode === "light") root.classed("theme-light", true);
+        if (mode === "dark") root.classed("theme-dark", true);
     }
 
     function getStoredTheme() {
@@ -219,21 +230,22 @@ d3.select("#sidebar-overlay").on("click", function () {
     }
 
     var initial = getStoredTheme();
-    themeSelect.value = initial;
+    themeSelect.property("value", initial);
     applyTheme(initial);
 
-    themeSelect.addEventListener("change", function () {
-        var mode = themeSelect.value;
+    themeSelect.on("change", function () {
+        var mode = themeSelect.property("value");
         localStorage.setItem("theme-preference", mode);
         applyTheme(mode);
     });
 })();
 
 // --- Raccourci clavier Ctrl+K / ⌘K pour focaliser la recherche ---
-document.addEventListener("keydown", function (e) {
+d3.select(document).on("keydown", function () {
+    var e = d3.event;
     if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
-        document.getElementById("search-city").focus();
+        d3.select("#search-city").node().focus();
     }
 });
 
@@ -242,16 +254,16 @@ document.addEventListener("keydown", function (e) {
 // =============================================================
 
 (function () {
-    var deleteBtn = document.getElementById("btn-delete-account");
-    var modal = document.getElementById("delete-modal");
-    if (!deleteBtn || !modal) return;
+    var deleteBtn = d3.select("#btn-delete-account");
+    var modal = d3.select("#delete-modal");
+    if (deleteBtn.empty() || modal.empty()) return;
 
-    var backdrop = document.getElementById("delete-modal-backdrop");
-    var tokenEl = document.getElementById("delete-token");
-    var inputEl = document.getElementById("delete-input");
-    var errorEl = document.getElementById("delete-error");
-    var cancelBtn = document.getElementById("delete-cancel");
-    var confirmBtn = document.getElementById("delete-confirm");
+    var backdrop = d3.select("#delete-modal-backdrop");
+    var tokenEl = d3.select("#delete-token");
+    var inputEl = d3.select("#delete-input");
+    var errorEl = d3.select("#delete-error");
+    var cancelBtn = d3.select("#delete-cancel");
+    var confirmBtn = d3.select("#delete-confirm");
 
     var currentToken = "";
 
@@ -266,44 +278,44 @@ document.addEventListener("keydown", function (e) {
 
     function openModal() {
         currentToken = randomToken();
-        tokenEl.textContent = currentToken;
-        inputEl.value = "";
-        errorEl.textContent = "";
-        confirmBtn.disabled = true;
-        modal.classList.add("open");
-        modal.setAttribute("aria-hidden", "false");
-        setTimeout(function () { inputEl.focus(); }, 50);
+        tokenEl.text(currentToken);
+        inputEl.property("value", "");
+        errorEl.text("");
+        confirmBtn.property("disabled", true);
+        modal.classed("open", true);
+        modal.attr("aria-hidden", "false");
+        setTimeout(function () { inputEl.node().focus(); }, 50);
     }
 
     function closeModal() {
-        modal.classList.remove("open");
-        modal.setAttribute("aria-hidden", "true");
+        modal.classed("open", false);
+        modal.attr("aria-hidden", "true");
     }
 
-    deleteBtn.addEventListener("click", function () {
+    deleteBtn.on("click", function () {
         openModal();
     });
 
-    backdrop.addEventListener("click", closeModal);
-    cancelBtn.addEventListener("click", closeModal);
+    backdrop.on("click", closeModal);
+    cancelBtn.on("click", closeModal);
 
-    inputEl.addEventListener("input", function () {
-        var ok = inputEl.value.trim().toUpperCase() === currentToken;
-        confirmBtn.disabled = !ok;
+    inputEl.on("input", function () {
+        var ok = inputEl.property("value").trim().toUpperCase() === currentToken;
+        confirmBtn.property("disabled", !ok);
     });
 
-    confirmBtn.addEventListener("click", function () {
-        errorEl.textContent = "";
-        confirmBtn.disabled = true;
-        confirmBtn.textContent = "Suppression…";
+    confirmBtn.on("click", function () {
+        errorEl.text("");
+        confirmBtn.property("disabled", true);
+        confirmBtn.text("Suppression…");
 
         var client = window.sb;
         var baseUrl = window.SUPABASE_URL;
         var anonKey = window.SUPABASE_ANON;
         if (!client || !baseUrl || !anonKey) {
-            errorEl.textContent = "Client Supabase non disponible.";
-            confirmBtn.textContent = "Supprimer définitivement";
-            confirmBtn.disabled = false;
+            errorEl.text("Client Supabase non disponible.");
+            confirmBtn.text("Supprimer définitivement");
+            confirmBtn.property("disabled", false);
             return;
         }
 
@@ -326,9 +338,9 @@ document.addEventListener("keydown", function (e) {
             }).then(function () {
                 window.location.href = "login.html";
             }).catch(function (err) {
-                errorEl.textContent = "Suppression impossible. " + err.message;
-                confirmBtn.textContent = "Supprimer définitivement";
-                confirmBtn.disabled = false;
+                errorEl.text("Suppression impossible. " + err.message);
+                confirmBtn.text("Supprimer définitivement");
+                confirmBtn.property("disabled", false);
             });
         });
     });
@@ -2192,3 +2204,11 @@ d3.queue()
         console.log("🚀 GeoVilles Explorer initialisé avec succès !");
 
     }); // Fin du callback d3.queue().await()
+
+    } // Fin de initApp()
+
+    // dom-builder.js s'est exécuté avant (script synchrone), le DOM est prêt.
+    // On appelle initApp() directement.
+    initApp();
+
+})();
