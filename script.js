@@ -67,6 +67,9 @@ var PALETTE_DONUT = ["#6366f1", "#a855f7", "#ec4899", "#f59e0b", "#22c55e", "#06
 // Tableau pour stocker les villes cliquées (max 2)
 var selection = [];
 
+// Slot actif pour la sélection explicite : 1 (Ville 1), 2 (Ville 2), null (aucun)
+var slotSelectionActif = null;
+
 // URL du GeoJSON des départements français
 var urlGeoJSON = "https://raw.githubusercontent.com/gregoiredavid/france-geojson/master/departements.geojson";
 
@@ -1020,13 +1023,13 @@ d3.queue()
                 .classed("selected-v1", false)
                 .classed("selected-v2", false);
 
-            if (selection.length >= 1) {
+            if (selection[0]) {
                 gVilles.selectAll("circle")
                     .classed("selected-v1", function (c) {
                         return c.COM === selection[0].COM;
                     });
             }
-            if (selection.length >= 2) {
+            if (selection[1]) {
                 gVilles.selectAll("circle")
                     .classed("selected-v2", function (c) {
                         return c.COM === selection[1].COM;
@@ -1039,12 +1042,45 @@ d3.queue()
         // 17. LOGIQUE DE SÉLECTION DES VILLES
         // =============================================================
 
+        // Initialisation de la sélection par slots (Ville 1 / Ville 2)
+        function mettreAJourUISelectionSlot() {
+            cardVille1
+                .style("cursor", "pointer")
+                .style("outline", slotSelectionActif === 1 ? "2px solid var(--couleur-v1)" : "none")
+                .style("background", slotSelectionActif === 1 ? "rgba(99,102,241,0.1)" : null);
+
+            cardVille2
+                .style("cursor", "pointer")
+                .style("outline", slotSelectionActif === 2 ? "2px solid var(--couleur-v2)" : "none")
+                .style("background", slotSelectionActif === 2 ? "rgba(245,158,11,0.1)" : null);
+        }
+
+        cardVille1.on("click", function () {
+            d3.event.stopPropagation();
+            slotSelectionActif = 1;
+            mettreAJourUISelectionSlot();
+        });
+
+        cardVille2.on("click", function () {
+            d3.event.stopPropagation();
+            slotSelectionActif = 2;
+            mettreAJourUISelectionSlot();
+        });
+
+        mettreAJourUISelectionSlot();
+
         function ajouterVille(ville) {
-            // Reset si déjà 2 villes sélectionnées
-            if (selection.length >= 2) {
-                selection = [];
+            // L'utilisateur doit d'abord cliquer sur l'encadré Ville 1 ou Ville 2
+            if (slotSelectionActif !== 1 && slotSelectionActif !== 2) {
+                return;
             }
-            selection.push(ville);
+
+            // Affecte la ville au slot sélectionné
+            selection[slotSelectionActif - 1] = ville;
+
+            // Désactive le mode après sélection
+            slotSelectionActif = null;
+            mettreAJourUISelectionSlot();
 
             // Mise à jour des panneaux latéraux
             mettreAJourCartes();
