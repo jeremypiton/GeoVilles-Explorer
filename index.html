@@ -1,0 +1,49 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeoVilles Explorer  Explorateur de Villes Françaises</title>
+    <meta name="description"
+        content="Dashboard D3.js  Explorez et comparer les villes françaises de plus de 20 000 habitants.">
+
+    <!-- Typographies : Inter (UI) + JetBrains Mono (chiffres) -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* App masquée jusqu'à auth confirmée */
+        .app {
+            opacity: 0;
+            transition: opacity .3s ease;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Tout le contenu sera généré dynamiquement par JavaScript -->
+    <div id="root"></div>
+
+    <!-- Auth Guard Local (Remplace Supabase) -->
+    <script>
+        (function () {
+            var rawSession = localStorage.getItem('gv_session');
+            if (!rawSession) {
+                // Pas connecté -> rediriger
+                window.location.replace('login.html');
+            }
+        })();
+    </script>
+
+    <!-- D3.js v4.1.1 via CDN Cloudflare -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.1.1/d3.js"></script>
+    <!-- DOM Builder doit être chargé avant script.js -->
+    <script src="dom-builder.js"></script>
+    <script src="script.js"></script>
+
+</body>
+
+</html>

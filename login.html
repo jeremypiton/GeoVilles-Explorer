@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeoVilles Explorer — Connexion</title>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+
+    <script>
+        (function () {
+            var mode = localStorage.getItem('theme-preference') || 'system';
+            var root = document.documentElement;
+            root.classList.remove('theme-light', 'theme-dark');
+            if (mode === 'light') root.classList.add('theme-light');
+            if (mode === 'dark') root.classList.add('theme-dark');
+        })();
+    </script>
+
+    <style>
+        /* ===== LOGIN PAGE ===== */
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: auto;
+            background: var(--bg-0);
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+            padding: 24px;
+        }
+
+        .login-card {
+            background: var(--bg-1);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 40px 32px;
+            text-align: center;
+        }
+
+        .login-brand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+        }
+
+        .login-brand h1 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+        }
+
+        .login-subtitle {
+            font-size: 0.8125rem;
+            color: var(--text-3);
+            margin: 8px 0 28px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-2);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 6px;
+        }
+
+        .form-group input {
+            width: 100%;
+            height: 44px;
+            padding: 0 14px;
+            background: var(--bg-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-family: var(--font-sans);
+            font-size: 14px;
+            color: var(--text-0);
+            outline: none;
+            transition: border-color .2s ease, box-shadow .2s ease;
+        }
+
+        .form-group input:focus {
+            border-color: var(--accent-border);
+            box-shadow: 0 0 0 3px var(--accent-soft);
+        }
+
+        .form-group input::placeholder {
+            color: var(--text-3);
+        }
+
+        .btn-primary {
+            width: 100%;
+            height: 44px;
+            border: none;
+            border-radius: var(--radius-sm);
+            background: linear-gradient(135deg, var(--couleur-v1), #a855f7);
+            color: #fff;
+            font-family: var(--font-sans);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity .15s ease, transform .1s ease;
+            margin-top: 8px;
+        }
+
+        .btn-primary:hover {
+            opacity: .9;
+        }
+
+        .btn-primary:active {
+            transform: scale(.98);
+        }
+
+        .btn-primary:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+        }
+
+        .toggle-mode {
+            margin-top: 20px;
+            font-size: 0.8125rem;
+            color: var(--text-3);
+        }
+
+        .toggle-mode a {
+            color: var(--accent);
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .toggle-mode a:hover {
+            text-decoration: underline;
+        }
+
+        .alert {
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 0.8125rem;
+            margin-bottom: 16px;
+            text-align: left;
+            display: none;
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, .1);
+            border: 1px solid rgba(239, 68, 68, .25);
+            color: #fca5a5;
+        }
+
+        .alert-success {
+            background: rgba(34, 197, 94, .1);
+            border: 1px solid rgba(34, 197, 94, .25);
+            color: #86efac;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 20px 0;
+            color: var(--text-3);
+            font-size: 0.75rem;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .login-footer {
+            margin-top: 28px;
+            font-size: 11px;
+            color: var(--text-3);
+        }
+
+        .login-theme {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Tout le contenu sera généré dynamiquement par JavaScript -->
+    <div id="login-root"></div>
+
+    <!-- D3.js nécessaire pour login-builder.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.1.1/d3.js"></script>
+    <!-- Construction du DOM de la page login -->
+    <script src="login-builder.js"></script>
+    <!-- Auth locale (doit être APRES login-builder pour que le formulaire existe) -->
+    <script src="auth.js"></script>
+</body>
+
+</html>
