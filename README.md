@@ -44,6 +44,23 @@ Ouvrir **http://localhost:8000** dans le navigateur.
 1. Installer l'extension **Live Server** dans VS Code
 2. Clic droit sur `index.html` → **Open with Live Server**
 
+### Option 4 — Lanceur Windows (.bat)
+
+Double-cliquer sur `lancer-geovilles.bat` pour :
+
+- démarrer automatiquement le serveur local Python
+- ouvrir automatiquement l'application dans le navigateur
+
+Par défaut, le port utilisé est **8000**.
+
+Pour choisir un autre port, lancer dans un terminal :
+
+```bash
+lancer-geovilles.bat 8010
+```
+
+Puis ouvrir **http://localhost:8010** si le navigateur ne s'ouvre pas tout seul.
+
 ## Structure du projet
 
 ```
@@ -51,6 +68,7 @@ D3.js/
 ├── index.html              # Page HTML principale (navigation par onglets)
 ├── style.css               # Feuille de styles (dark mode, glassmorphism)
 ├── script.js               # Script D3.js v4 (logique, visualisations, API)
+├── lancer-geovilles.bat    # Lanceur Windows (serveur + ouverture navigateur)
 ├── donnees_communes.csv    # Données INSEE — Recensement de la population
 └── README.md               # Notice d'installation (ce fichier)
 ```
